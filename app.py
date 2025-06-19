@@ -1,81 +1,88 @@
 """
-Sistema de Emergência Médica - AV2 Estrutura de Dados
-Autor: Ricardo José da Silva
-Data: 17 de junho de 2025
-
-Sistema que utiliza grafos para encontrar a rota mais rápida
-entre pontos de emergência médica na cidade.
+Sistema de Rotas entre Hospitais - AV2 Estrutura de Dados
+Problema real: Otimização de rotas para ambulâncias e transferências médicas
 """
 
-from grafo_emergencia import GrafoEmergencia
-from visualizador import VisualizadorGrafo
-from menu_interativo import MenuInterativo
+import random
+import numpy as np
+from mapa_visual import MapaHospitais
+
+class GrafoHospitais:
+    def __init__(self):
+        # Lista de hospitais
+        self.hospitais = ["Hospital Central", "UPA Norte", "Hospital São Lucas", 
+                         "UPA Sul", "Hospital Infantil"]
+        
+        self.num_hospitais = len(self.hospitais)
+        
+        # Matriz de adjacência com tempos base (minutos)
+        self.matriz_base = np.array([
+            [0,  12, 18, 15, 22],  # Hospital Central
+            [12, 0,  25, 30, 20],  # UPA Norte  
+            [18, 25, 0,  14, 8 ],  # Hospital São Lucas
+            [15, 30, 14, 0,  16],  # UPA Sul
+            [22, 20, 8,  16, 0 ]   # Hospital Infantil
+        ])
+        
+        # Matriz de trânsito (multiplicadores aleatórios)
+        self.atualizar_transito()
+    
+    def atualizar_transito(self):
+        """Gera condições de trânsito aleatórias"""
+        self.transito = np.ones((self.num_hospitais, self.num_hospitais))
+        
+        for i in range(self.num_hospitais):
+            for j in range(self.num_hospitais):
+                if i != j:
+                    # Multiplicador entre 0.8 (livre) e 2.2 (congestionado)
+                    self.transito[i][j] = random.uniform(0.8, 2.2)
+    
+    def calcular_tempo(self, origem: int, destino: int) -> float:
+        """Calcula tempo atual com trânsito"""
+        return self.matriz_base[origem][destino] * self.transito[origem][destino]
 
 def main():
-    print("=" * 60)
-    print("🏥 SISTEMA DE EMERGÊNCIA MÉDICA - REDE HOSPITALAR")
-    print("=" * 60)
+    print("🏥 SISTEMA DE ROTAS ENTRE HOSPITAIS")
+    print("="*40)
     
-    # Criar o grafo de emergência
-    sistema = GrafoEmergencia()
+    grafo = GrafoHospitais()
+    mapa = MapaHospitais(grafo)
     
-    # Inicializar dados do sistema
-    inicializar_rede_hospitalar(sistema)
-    
-    # Criar menu interativo
-    menu = MenuInterativo(sistema)
-    
-    # Executar menu principal
-    menu.executar()
-
-def inicializar_rede_hospitalar(sistema):
-    """Inicializa a rede hospitalar com dados realistas"""
-    print("\n🏗️  Inicializando rede hospitalar...")
-    
-    # Adicionar pontos médicos estrategicamente distribuídos
-    sistema.adicionar_ponto("Hospital Central", "hospital", (0, 0))
-    sistema.adicionar_ponto("UPA Norte", "upa", (-2, 3))
-    sistema.adicionar_ponto("Hospital São Lucas", "hospital", (4, 2))
-    sistema.adicionar_ponto("UPA Sul", "upa", (1, -3))
-    sistema.adicionar_ponto("Pronto Socorro 24h", "pronto_socorro", (-3, -1))
-    sistema.adicionar_ponto("Hospital Infantil", "hospital", (3, -2))
-    sistema.adicionar_ponto("UPA Leste", "upa", (5, 0))
-    sistema.adicionar_ponto("Hospital Universitário", "hospital", (-1, 4))
-    
-    # Definir conexões com tempos base calculados automaticamente
-    # Tempos serão calculados baseados na distância euclidiana
-    conexoes = [
-        ("Hospital Central", "UPA Norte"),
-        ("Hospital Central", "Hospital São Lucas"),
-        ("Hospital Central", "Pronto Socorro 24h"),
-        ("Hospital Central", "UPA Sul"),
-        ("Hospital Central", "Hospital Infantil"),
+    while True:
+        print("\n1. Consultar tempo entre hospitais")
+        print("2. Visualizar mapa da cidade")
+        print("3. Sair")
         
-        ("UPA Norte", "Hospital Universitário"),
-        ("UPA Norte", "Hospital São Lucas"),
+        opcao = input("\nOpção: ").strip()
         
-        ("Hospital São Lucas", "UPA Leste"),
-        ("Hospital São Lucas", "Hospital Infantil"),
-        ("Hospital São Lucas", "UPA Sul"),
+        if opcao == '1':
+            print("\nHospitais disponíveis:")
+            for i, hospital in enumerate(grafo.hospitais):
+                print(f"{i}. {hospital}")
+            
+            try:
+                origem = int(input("\nOrigem: "))
+                destino = int(input("Destino: "))
+                
+                if 0 <= origem < grafo.num_hospitais and 0 <= destino < grafo.num_hospitais:
+                    tempo = grafo.calcular_tempo(origem, destino)
+                    print(f"\n🚑 Tempo estimado: {tempo:.1f} minutos")
+                    print(f"   {grafo.hospitais[origem]} → {grafo.hospitais[destino]}")
+                else:
+                    print("❌ Números inválidos!")
+            except ValueError:
+                print("❌ Digite números válidos!")
         
-        ("UPA Sul", "Hospital Infantil"),
-        ("UPA Sul", "Pronto Socorro 24h"),
+        elif opcao == '2':
+            grafo.atualizar_transito()  # Atualiza trânsito antes de mostrar
+            mapa.mostrar_mapa()
         
-        ("Pronto Socorro 24h", "Hospital Universitário"),
+        elif opcao == '3':
+            print("\n👋 Até logo!")
+            break
         
-        ("Hospital Infantil", "UPA Leste"),
-        
-        ("UPA Leste", "Hospital Universitário"),
-    ]
-    
-    # Adicionar todas as conexões (tempo será calculado automaticamente)
-    for origem, destino in conexoes:
-        # Calcular tempo baseado na distância
-        distancia = sistema.calcular_distancia_euclidiana(origem, destino)
-        tempo_calculado = sistema.calcular_tempo_por_distancia(distancia)
-        sistema.adicionar_rota(origem, destino, tempo_calculado)
-    
-    print("✅ Rede hospitalar inicializada com sucesso!")
+        else:
+            print("❌ Opção inválida!")
 
 if __name__ == "__main__":
     main()

@@ -1,105 +1,106 @@
-# Sistema de Emergência Médica - AV2 Estrutura de Dados
+# Sistema de Rotas entre Hospitais 🏥
 
-## 📋 Descrição do Projeto
+## Descrição do Projeto
 
-Este projeto implementa um **sistema de emergência médica** utilizando **grafos** e **matriz de adjacência** para encontrar as rotas mais rápidas entre pontos de atendimento médico na cidade.
+Sistema simples que implementa **grafos** com **matriz de adjacência** para calcular tempos de trajeto entre hospitais considerando condições de trânsito em tempo real. Perfeito para demonstrar conceitos de estrutura de dados com problema real.
 
-## 🎯 Objetivo
+## Problema Real
 
-Resolver um problema real: otimizar o tempo de deslocamento de ambulâncias e transferências entre hospitais, UPAs e prontos socorros, garantindo atendimento mais eficiente em emergências.
+- **Situação**: Ambulâncias precisam saber o tempo de deslocamento entre hospitais
+- **Solução**: Matriz de adjacência com multiplicadores de trânsito aleatórios
+- **Aplicação**: Logística médica, transferências de emergência
 
-## 🏗️ Estrutura do Projeto
+## Funcionalidades
 
-```
-AV2-EstruturadeDados/
-├── app.py                 # Arquivo principal
-├── grafo_emergencia.py    # Classe do grafo com matriz de adjacência
-├── visualizador.py        # Visualização gráfica do grafo
-├── requirements.txt       # Dependências do projeto
-└── README.md             # Este arquivo
-```
+1. **Consulta de Tempo**: Calcula tempo entre dois hospitais específicos
+2. **Mapa Visual**: Mostra cidade com ruas, quarteirões e condições de trânsito
+3. **Trânsito Dinâmico**: Condições aleatórias a cada visualização
 
-## 🧩 Classes Principais
+## Arquivos
 
-### 1. **GrafoEmergencia**
-- **Responsabilidade**: Gerenciar a rede de pontos médicos
-- **Estrutura de dados**: Matriz de adjacência
-- **Funcionalidades**:
-  - Adicionar pontos médicos (hospitais, UPAs, prontos socorros)
-  - Definir tempos de deslocamento entre pontos
-  - Encontrar rota mais rápida (Algoritmo de Dijkstra)
-  - Exibir matriz de adjacência
+- `app.py` - Programa principal (76 linhas)
+- `mapa_visual.py` - Visualização do mapa (180 linhas)
+- `requirements.txt` - Dependências
 
-### 2. **VisualizadorGrafo**
-- **Responsabilidade**: Criar visualizações do grafo
-- **Bibliotecas**: matplotlib, networkx
-- **Funcionalidades**:
-  - Plotar rede completa de pontos médicos
-  - Destacar rotas específicas
-  - Salvar gráficos em PNG
+## Como Usar
 
-## 🚀 Como Executar
-
-### 1. Instalar Dependências
+1. **Instalar dependências:**
 ```bash
-pip install -r requirements.txt
+pip install numpy matplotlib
 ```
 
-### 2. Executar o Sistema
+2. **Executar:**
 ```bash
 python app.py
 ```
 
-## 📊 Exemplo de Funcionamento
+3. **Menu:**
+   - **Opção 1**: Consultar tempo entre hospitais
+   - **Opção 2**: Ver mapa visual da cidade
+   - **Opção 3**: Sair
 
-O sistema cria uma rede com 6 pontos médicos:
-- **Hospital Central** 🏥
-- **UPA Norte** 🚑  
-- **Hospital São Lucas** 🏥
-- **UPA Sul** 🚑
-- **Pronto Socorro** ⛑️
-- **Hospital Infantil** 🏥
+## Estrutura dos Dados
 
-### Matriz de Adjacência (Tempos em minutos):
-```
-                Hospital Central  UPA Norte  Hospital São Lucas  ...
-Hospital Central        0           12            18           ...
-UPA Norte              12            0            15           ...
-Hospital São Lucas     18           15             0           ...
-...
-```
+### Hospitais:
+- Hospital Central
+- UPA Norte  
+- Hospital São Lucas
+- UPA Sul
+- Hospital Infantil
 
-### Exemplo de Rota:
+### Matriz de Adjacência (5x5):
 ```
-🚨 EMERGÊNCIA: UPA Norte → Hospital Infantil
-Rota mais rápida: UPA Norte → Hospital Infantil
-Tempo total: 10 minutos
+         HC  UN  HSL  US  HI
+HC    [  0, 12, 18, 15, 22 ]
+UN    [ 12,  0, 25, 30, 20 ]
+HSL   [ 18, 25,  0, 14,  8 ]
+US    [ 15, 30, 14,  0, 16 ]
+HI    [ 22, 20,  8, 16,  0 ]
 ```
 
-## 🎨 Visualização
+### Multiplicadores de Trânsito:
+- **0.8 - 1.2**: Trânsito livre (verde)
+- **1.2 - 1.8**: Trânsito moderado (laranja)  
+- **1.8 - 2.2**: Congestionamento (vermelho)
 
-O sistema gera um grafo visual com:
-- **Nós coloridos** por tipo de estabelecimento
-- **Arestas** com tempos de deslocamento
-- **Destaque** para rotas específicas
+## Exemplo de Uso
 
-## 🔧 Conceitos de Estrutura de Dados Utilizados
+```
+🏥 SISTEMA DE ROTAS ENTRE HOSPITAIS
+========================================
 
-1. **Grafo Não-Direcionado**: Conexões bidirecionais entre pontos
-2. **Matriz de Adjacência**: Armazenamento eficiente dos tempos
-3. **Algoritmo de Dijkstra**: Busca pela rota mais rápida
-4. **Dicionários**: Mapeamento nome ↔ índice dos pontos
+1. Consultar tempo entre hospitais
+2. Visualizar mapa da cidade
+3. Sair
 
-## 📈 Possíveis Expansões
+Opção: 1
 
-- Considerar trânsito em horários diferentes
-- Adicionar tipos de ambulância (UTI móvel, resgate)
-- Implementar sistema de prioridades
-- Integração com GPS real
-- Interface gráfica interativa
+Hospitais disponíveis:
+0. Hospital Central
+1. UPA Norte
+2. Hospital São Lucas
+3. UPA Sul
+4. Hospital Infantil
 
-## 👨‍💻 Autor
+Origem: 0
+Destino: 4
 
-**Ricardo José da Silva**  
-AV2 - Estrutura de Dados  
-Data: 17 de junho de 2025
+🚑 Tempo estimado: 28.6 minutos
+   Hospital Central → Hospital Infantil
+```
+
+## Conceitos Demonstrados
+
+- **Grafos**: Representação da rede de hospitais
+- **Matriz de Adjacência**: Armazenamento eficiente dos pesos
+- **Simulação Probabilística**: Condições de trânsito variáveis
+
+## Mapa Visual
+
+O sistema gera um mapa realista com:
+- 🏘️ **Quarteirões**: Residenciais, comerciais e parque
+- �️ **Ruas**: Avenidas principais e ruas secundárias  
+- 🏥 **Hospitais**: Com ícones diferenciados
+- 🚦 **Trânsito**: Cores indicando condições atuais
+
+Desenvolvido para AV2 - Estrutura de Dados
